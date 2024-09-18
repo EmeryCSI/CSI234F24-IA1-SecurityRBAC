@@ -2,14 +2,14 @@
 
 <div align="center">  
     <img src="logo.jpg" alt="Logo">
-    <h3 align="center">Independent Activity 2: RBAC Implementation in AdventureWorksLT</h3>
+    <h3 align="center">Independent Activity 1: Security with RBAC</h3>
 </div>
 
 This repository is a part of CSI-234 at Renton Technical College.
 
 Clone this repository to your local machine and complete the instructions below. You will be submitting your SQL scripts and screenshots of your output.
 
-## Independent Activity 2 Part 1: Repository Setup
+## Part 1: Repository Setup
 
 1. Clone the repository to your local machine using GitHub Desktop or another GitHub tool.
 2. Make note of the folder where you cloned the repository.
