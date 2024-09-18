@@ -1,158 +1,128 @@
 # Renton Technical College CSI-234
-<br />    
 
 <div align="center">  
     <img src="logo.jpg" alt="Logo">
-    <h3 align="center">Independent Activity1</h3>
+    <h3 align="center">Independent Activity 2: RBAC Implementation in AdventureWorksLT</h3>
 </div>
 
 This repository is a part of CSI-234 at Renton Technical College.
 
-Clone this repository to your local machine and complete the instructions below. You will be submitting screenshots as well as SQL code in this repository
+Clone this repository to your local machine and complete the instructions below. You will be submitting your SQL scripts and screenshots of your output.
 
-## Independent Activity 1 - Project Setup
+## Independent Activity 2 Part 1: Repository Setup
 
-1. Clone the repository to your local machine using GitHub Desktop or other GitHub tool.
+1. Clone the repository to your local machine using GitHub Desktop or another GitHub tool.
 2. Make note of the folder where you cloned the repository.
-3. Click Show in Explorer to open the repository folder.
-4. Inside of this folder create a screenshots folder. This is where you will save your screenshots for this assignmnent.
-5. Just to test that it is working take a screenshot of your desktop and save it inside of the screenshots folder.
-6. Create a new commit "Testing Screenshots" and push the changes to GitHub.
+
+## Part 2: Database Exploration and User Creation
+
+1. Connect to your SQL Server instance and use the AdventureWorksLT database.
+2. Explore the existing tables in the SalesLT schema. You'll be working with these tables for your RBAC implementation.
+3. We need to create logins and users for the following accounts.
+   - ProjectManager
+   - Developer
+   - HR_Specialist
+   - Sales_Representative
+4. Save your user creation SQL script as `01_Logins_Users.sql`.
+
+## Part 3: Role Creation and Permission Assignment
+
+1. Create appropriate roles for each of the users you created.
+2. Assign permissions to the roles based on the following requirements:
+   - Project Managers should have full access to the SalesLT.Product and SalesLT.ProductCategory tables, and read-only access to SalesLT.Customer and SalesLT.SalesOrderHeader.
+   - Developers should have read and update access to SalesLT.Product and SalesLT.ProductCategory, but no access to customer or sales information.
+   - HR Specialists should have full access to SalesLT.Customer, but no access to product or sales information.
+   - Sales Representatives should have read and update access to SalesLT.Customer and SalesLT.SalesOrderHeader, read-only access to SalesLT.Product, and no access to SalesLT.ProductCategory.
+3. Save your role creation and permission assignment SQL script as `02_roles_and_permissions.sql`.
+
+## Part 4: Column-Level Security
+
+1. Implement column-level security for at least one sensitive column in each of the following tables. You may choose which column:
+   - SalesLT.Product
+   - SalesLT.Customer
+   - SalesLT.SalesOrderHeader
+2. Save your column-level security SQL script as `03_column_security.sql`.
+
+## Part 5: Testing
+
+In this section, you'll write and execute SQL queries to test the access for each role, ensuring they can perform allowed actions and are restricted from unauthorized access. You'll also test your column-level security implementation.
+
+1. Create a new SQL script file named `04_access_tests.sql` in your repository.
+
+2. In this file, include the following tests for each role. Be sure to use the EXECUTE AS USER statement to switch contexts for each test, and REVERT to switch back.
+
+### ProjectManager Tests:
+a. Test full access to SalesLT.Product (take screenshot):
+   ```sql
+   EXECUTE AS USER = 'ProjectManager';
+   -- Attempt to SELECT, INSERT, UPDATE, and DELETE on SalesLT.Product
+   -- Show the results
+   REVERT;
+   ```
+
+b. Test read-only access to SalesLT.Customer (take screenshot):
+   ```sql
+   EXECUTE AS USER = 'ProjectManager';
+   -- Attempt to SELECT from SalesLT.Customer (should succeed)
+   -- Attempt to INSERT into SalesLT.Customer (should fail)
+   -- Show the results of both attempts
+   REVERT;
+   ```
+
+### Developer Tests:
+a. Test read and update access to SalesLT.ProductCategory (take screenshot):
+   ```sql
+   EXECUTE AS USER = 'Developer';
+   -- Attempt to SELECT and UPDATE SalesLT.ProductCategory (should succeed)
+   -- Attempt to DELETE from SalesLT.ProductCategory (should fail)
+   -- Show the results of all attempts
+   REVERT;
+   ```
+
+b. Test no access to SalesLT.SalesOrderHeader (take screenshot):
+   ```sql
+   EXECUTE AS USER = 'Developer';
+   -- Attempt to SELECT from SalesLT.SalesOrderHeader (should fail)
+   -- Show the result
+   REVERT;
+   ```
+
+### HR_Specialist Tests:
+a. Test full access to SalesLT.Customer (take screenshot):
+   ```sql
+   EXECUTE AS USER = 'HR_Specialist';
+   -- Attempt to SELECT, INSERT, UPDATE, and DELETE on SalesLT.Customer
+   -- Show the results
+   REVERT;
+   ```
+
+b. Test no access to SalesLT.Product (take screenshot):
+   ```sql
+   EXECUTE AS USER = 'HR_Specialist';
+   -- Attempt to SELECT from SalesLT.Product (should fail)
+   -- Show the result
+   REVERT;
+   ```
+
+### Sales_Representative Tests:
+a. Test read and update access to SalesLT.SalesOrderHeader (take screenshot):
+   ```sql
+   EXECUTE AS USER = 'Sales_Representative';
+   -- Attempt to SELECT and UPDATE SalesLT.SalesOrderHeader (should succeed)
+   -- Attempt to DELETE from SalesLT.SalesOrderHeader (should fail)
+   -- Show the results of all attempts
+   REVERT;
+   ```
+
+3. Include screenshots of your test results, clearly showing which tests passed and failed. Save these screenshots in the repository with the query.
 
 
-### Assignment: Create SQL Server Logins with Varying Access Levels
+## Submission
 
-#### Objective:
-Create 5 different logins for your SQL Server, each with varying levels of access that might commonly be needed in a deployed cloud database.
-Save the .sql script for each user in the assignment repository.
-<p><a href="https://learn.microsoft.com/en-us/sql/relational-databases/security/authentication-access/server-level-roles?view=sql-server-ver16">Server-level roles - SQL Server | Microsoft Learn</a></p>
-<p><a href="https://learn.microsoft.com/en-us/sql/relational-databases/security/authentication-access/database-level-roles?view=sql-server-ver16">Database-Level Roles - SQL Server | Microsoft Learn</a></p>
-
-#### Template:
-```sql
--- Run on master
-CREATE LOGIN [LoginName] WITH PASSWORD = '[SecurePassword]';
-
--- RUN on the database that you want the user to access
-CREATE USER [LoginName]
-FROM LOGIN [LoginName]
--- Add the roles or permissions that you want the user to have based on the description
-```
-
-#### Note:
-- Replace `[LoginName]` with the actual name of the login and `[SecurePassword]` with a secure password.
-- Adapt the script to meet the access level described for each login.
-
-#### Login 1: Report Generator
-- **Description:** This login is for a report generator who needs read-only access to the database.
-- **Access Level:** Read-only access to all tables in the database.
-- **Create a new query to create this user:** Save the .sql file to this repository.
-- **Login with the new Account:**
-
-- **Run the following Queries and Screenshot the output**
-
-  - **This Query should work**
-    ```sql
-    SELECT * FROM SalesLT.Customer;
-    ```
-    Run this query and take a screenshot of the output and add to the screenshots directory
-
-  - **This Query should fail**
-    ```sql
-    DELETE FROM SalesLT.Customer WHERE CustomerID = 1;
-    ```
-    Run this query and take a screenshot of the output and add to the screenshots directory
+1. Ensure all your SQL scripts are saved in the repository.
+2. Include all of your screenshots in the repository.
+3. Commit your changes with the message "Independent Activity 1 Complete".
+4. Push your changes to GitHub.
 
 
-#### Login 2: Sales API
-- **Description:** This login is for a Web API that has full read/write access but only to tables in the SalesLT schema.
-- **Access Level:** Full read/write access to tables in the SalesLT schema.
-- **Create a new query to create this user:** Save the .sql file to this repository.
-- **Login with the new Account:**
-
-- **Run the following Queries and Screenshot the output**
-
-  - **This Query should work**
-    ```sql
-    SELECT FirstName, LastName FROM SalesLT.Customer WHERE CompanyName IS NOT NULL;
-    ```
-    Run this query and take a screenshot of the output and add to the screenshots directory
-
-  - **This Query should fail**
-    ```sql
-    UPDATE SalesLT.Product SET ListPrice = ListPrice * 0.9 WHERE ProductID < 100;
-    ```
-    Run this query and take a screenshot of the output and add to the screenshots directory
-
-#### Login 3: DB Maintenance
-- **Description:** This login is for a database maintenance user who needs to perform maintenance tasks such as reindexing and backups.
-- **Access Level:** Ability to perform maintenance tasks and backups.
-- **Create a new query to create this user:** Save the .sql file to this repository.
-- **Login with the new Account:**
-
-- **Run the following Queries and Screenshot the output**
-
-  - **This Query should work**
-    ```sql
-    SELECT AVG(ListPrice) AS AveragePrice FROM SalesLT.Product;
-    ```
-    Run this query and take a screenshot of the output and add to the screenshots directory
-
-  - **This Query should fail**
-    ```sql
-    INSERT INTO SalesLT.Address (AddressLine1, City, StateProvince, CountryRegion, PostalCode) VALUES ('123 Main St', 'Anytown', 'Anystate', 'USA', '12345');
-    ```
-    Run this query and take a screenshot of the output and add to the screenshots directory
-
-
-
-#### Login 4: Data Analyst
-- **Description:** This login is for a data analyst who needs read access to all tables and execute access to stored procedures.
-- **Access Level:** Read access to all tables and execute access to stored procedures.
-- **Create a new query to create this user:** Save the .sql file to this repository.
-- **Login with the new Account:**
-
-- **Run the following Queries and Screenshot the output**
-
-  - **This Query should work**
-    ```sql
-    SELECT TOP 5 * FROM SalesLT.SalesOrderHeader ORDER BY SalesOrderID DESC;
-    ```
-    Run this query and take a screenshot of the output and add to the screenshots directory
-
-  - **This Query should fail**
-    ```sql
-    ALTER TABLE SalesLT.SalesOrderDetail ADD DiscountAmount DECIMAL(10, 2);
-    ```
-    Run this query and take a screenshot of the output and add to the screenshots directory
-
-
-#### Login 5: Guest User
-- **Description:** This login is for a guest user who needs limited read-only access to view product information.
-- **Access Level:** Read-only access to SalesLT.Product table.
-- **Create a new query to create this user:** Save the .sql file to this repository.
-- **Login with the new Account:**
-
-- **Run the following Queries and Screenshot the output**
-
-  - **This Query should work**
-    ```sql
-    SELECT MIN(OrderQty) AS MinimumOrderQuantity FROM SalesLT.SalesOrderDetail;
-    ```
-    Run this query and take a screenshot of the output and add to the screenshots directory
-
-  - **This Query should fail**
-    ```sql
-    DROP TABLE SalesLT.Address;
-    ```
-    Run this query and take a screenshot of the output and add to the screenshots directory
-
-Create a new Commit in GitHub Desktop with "Assignment Complete"
-Push the changes to GitHub.
-
-
-If you have any questions about this assignment please reach out to myself or our TA for this course. 
-
-
-
-Feel free to message your instructor or the TA on Canvas if you have any questions.
+If you have any questions about this assignment, please reach out to your instructor or the TA for this course.
